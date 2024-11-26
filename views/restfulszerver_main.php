@@ -1,0 +1,1 @@
+<?php require_once 'restful/kliens.php'?>

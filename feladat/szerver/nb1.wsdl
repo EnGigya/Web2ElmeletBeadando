@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap-env="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://127.0.0.1/web2/feladat/szerver/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://127.0.0.1/web2/feladat/szerver/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://127.0.0.1/web2/feladat/szerver/">
+      <xsd:complexType name="Klub">
+        <xsd:all>
+          <xsd:element name="hibakod" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="uzenet" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="klub" type="tns:KlubokArray" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Klubok">
+        <xsd:all>
+          <xsd:element name="id" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="csapatnev" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Labdarugo">
+        <xsd:all>
+          <xsd:element name="hibakod" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="uzenet" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="id" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="csapatnev" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="labdarugo" type="tns:LabdarugokArray" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+      </xsd:complexType>
+      <xsd:complexType name="Labdarugok">
+        <xsd:all>
+          <xsd:element name="utonev" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          <xsd:element name="vezeteknev" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+        </xsd:all>
+      </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="getklubRequest"/>
+  <wsdl:message name="getklubResponse">
+    <wsdl:part name="getklubReturn" type="tns:Klub"/>
+  </wsdl:message>
+  <wsdl:message name="getlabdarugoRequest">
+    <wsdl:part name="id" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="getlabdarugoResponse">
+    <wsdl:part name="getlabdarugoReturn" type="tns:Labdarugo"/>
+  </wsdl:message>
+  <wsdl:portType name="Nb1PortType">
+    <wsdl:operation name="getklub">
+      <wsdl:documentation/>
+      <wsdl:input message="tns:getklubRequest"/>
+      <wsdl:output message="tns:getklubResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getlabdarugo">
+      <wsdl:documentation/>
+      <wsdl:input message="tns:getlabdarugoRequest"/>
+      <wsdl:output message="tns:getlabdarugoResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Nb1Binding" type="tns:Nb1PortType">
+    <soap-env:binding xmlns="http://schemas.xmlsoap.org/wsdl/soap/" style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getklub">
+      <soap-env:operation xmlns="http://schemas.xmlsoap.org/wsdl/soap/" soapAction="http://127.0.0.1/web2/feladat/szerver/szerver.php?method=getklub" style="rpc"/>
+      <wsdl:input>
+        <soap-env:body xmlns="http://schemas.xmlsoap.org/wsdl/soap/" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap-env:body xmlns="http://schemas.xmlsoap.org/wsdl/soap/" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getlabdarugo">
+      <soap-env:operation xmlns="http://schemas.xmlsoap.org/wsdl/soap/" soapAction="http://127.0.0.1/web2/feladat/szerver/szerver.php?method=getlabdarugo" style="rpc"/>
+      <wsdl:input>
+        <soap-env:body xmlns="http://schemas.xmlsoap.org/wsdl/soap/" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap-env:body xmlns="http://schemas.xmlsoap.org/wsdl/soap/" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Nb1">
+    <wsdl:documentation/>
+    <wsdl:port name="Nb1Port" binding="tns:Nb1Binding">
+      <soap-env:address location="http://127.0.0.1/web2/feladat/szerver/szerver.php"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

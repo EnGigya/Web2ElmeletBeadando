@@ -1,0 +1,1 @@
+<?php  require_once 'megoldás/labor3-2.php' ?>

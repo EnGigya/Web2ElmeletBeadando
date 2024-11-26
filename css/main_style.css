@@ -1,0 +1,76 @@
+html{
+    max-width: 1100px;
+    margin: 0 auto;
+    background-color: #0cb1b1;
+    
+}
+header {
+    padding: 0.5em; 
+    color: white;
+    background-image: url(../images/1.jpg);
+    clear: left;
+    height: 250px;
+}
+h1.header {
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    margin: 0 ;
+}
+#nyitólap{
+    text-align: center;
+    margin: 80px 0 50px 0;
+}
+div#user {
+    float: right;
+}
+p{
+    text-align:justify;
+    
+}
+#serleg{
+    width: 150px;
+    float: right;
+    margin: 0 0 0 10px;
+}
+#csapatok{
+    margin: 0 10px 10px 0;
+    width: 220px;
+    float: left;
+}
+footer{
+    background-color: #037D7D;
+    padding: 0.3em;
+}
+
+section {
+    
+    background-color: #bbebeb;
+    padding: 1em;
+}
+ul {
+    float:left;
+    width:100%; /* A menü az alatta levő szövegtől elválik, birtokolja a teljes vízszintes sávját. */
+    padding:0;
+    margin:0;
+    list-style-type:none;
+    background-color: #bbebeb;
+}        
+a {
+    float:left;
+    width:6em; /* Fix szélességű gombok érhetők el. Érdemes azonban vigyázni ezzel a módszerrel, mert ha a szöveg nem fér ki, a dizájn szétesik. */
+    height: 1em;
+    text-decoration:none; /* Ne legyen aláhúzva a link. */
+    color:#011d1d;
+    text-align:center;
+    background-color:#037D7D;
+    padding: 0.6em;
+    border-right:1px solid white;
+}
+a.selected{
+    background-color:#56BBBB;
+}
+a:hover { background-color:#56BBBB} /* Az egérkurzorra színváltással reagál a menüpont. */
+li { display:inline } /* Ez a sor oldja meg, hogy a menüpontok egymás mellé kerüljenek. */
