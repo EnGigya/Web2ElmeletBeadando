@@ -1,74 +1,93 @@
 <?php
 
+// Indítjuk a session-t, hogy a felhasználói adatokat tárolni tudjuk
 session_start();
-if(! isset($_SESSION['userid'])) $_SESSION['userid'] = 0;
-if(! isset($_SESSION['userfirstname'])) $_SESSION['userfirstname'] = "";
-if(! isset($_SESSION['userlastname'])) $_SESSION['userlastname'] = "";
-if(! isset($_SESSION['userlevel'])) $_SESSION['userlevel'] = "1__";
 
+// Alapértelmezett session értékek beállítása, ha még nincsenek beállítva
+if (!isset($_SESSION['userid'])) {
+    $_SESSION['userid'] = 0;
+}
+if (!isset($_SESSION['userfirstname'])) {
+    $_SESSION['userfirstname'] = "";
+}
+if (!isset($_SESSION['userlastname'])) {
+    $_SESSION['userlastname'] = "";
+}
+if (!isset($_SESSION['userlevel'])) {
+    $_SESSION['userlevel'] = "1__";
+}
+
+// Konstans változó, amely az alkalmazás gyökérkönyvtárát tárolja
+define('SERVER_ROOT', __DIR__ . '/');
+
+// A szükséges fájlok beillesztése
 include(SERVER_ROOT . 'includes/database.inc.php');
 include(SERVER_ROOT . 'includes/menu.inc.php');
+include(SERVER_ROOT . 'reg.php');
 
-// Felbontjuk a paramétereket. Az & elválasztó jellel végzett felbontás
-// megfelelõ lesz, elsõ eleme a megtekinteni kívánt oldal neve.
-
+// Alapértelmezett oldalt és aloldalt beállítjuk
 $page = "nyitolap";
 $subpage = "";
 $vars = array();
 
+// Az aktuális kérés (query string) kiolvasása
 $request = $_SERVER['QUERY_STRING'];
-
-if($request != "")
-{
-	$params = explode('/', $request);
-	$page = array_shift($params); // a kért oldal neve
-	
-	if(array_key_exists($page, Menu::$menu) && count($params)>0) // Az oldal egy menüpont oldala és van még adat az url-ben
-	{
-		$subpage = array_shift($params); // a kért aloldal
-		if(! (array_key_exists($subpage, Menu::$menu) && Menu::$menu[$subpage][1] == $page)) // ha nem egy alolal
-		{
-			$vars[] = $subpage; // akkor ez egy parameter
-			$subpage = ""; // és nincs aloldal
-		}
-	}
-	$vars += $_POST;
-	
-	foreach($params as $p) // a paraméterek tömbje feltöltése
-	{
-		$vars[] = $p;
-	}
+if ($request != "") {
+    // A kérés paramétereit a '/' karakterek mentén feldaraboljuk
+    $params = explode('/', trim($request, '/'));
+    
+    // Az oldal nevének meghatározása, ha nem található, akkor alapértelmezett: 'nyitolap'
+    $page = htmlspecialchars(array_shift($params) ?? 'nyitolap', ENT_QUOTES, 'UTF-8');
+    
+    // Ellenõrizzük, hogy az oldal szerepel-e a menüben, és van-e aloldal
+    if (array_key_exists($page, Menu::$menu) && count($params) > 0) {
+        // Az aloldalt is kinyerjük
+        $subpage = htmlspecialchars(array_shift($params), ENT_QUOTES, 'UTF-8');
+        
+        // Ha az aloldal nem tartozik az adott oldalhoz, akkor nem létezik, és hozzáadjuk a változókhoz
+        if (!(array_key_exists($subpage, Menu::$menu) && Menu::$menu[$subpage][1] == $page)) {
+            $vars[] = $subpage;
+            $subpage = "";
+        }
+    }
+    // A változók (GET, POST) egyesítése
+    $vars = array_merge($vars, $_GET, $_POST);
 }
 
-// Meghatározzuk a kért oldalhoz tartozó vezérlõt. Ha megtaláltuk
-// a fájlt és a hozzá tartozó vezérlõ oldalt is, akkor betöltjük az
-// elõbbiekben lekérdezett paramétereket továbbadva. 
+// A vezérlõ fájl meghatározása az oldal és az aloldal alapján
+$controllerfile = $page . ($subpage != "" ? "_" . $subpage : "");
+$target = SERVER_ROOT . 'controllers/' . $controllerfile . '.php';
 
-$controllerfile = $page.($subpage != "" ? "_".$subpage : "");
-$target = SERVER_ROOT.'controllers/'.$controllerfile.'.php';
-if(! file_exists($target))
-{
-	$controllerfile = "error404";
-	$target = SERVER_ROOT.'controllers/error404.php';
+// Ha a vezérlõ fájl nem található, akkor az 404-es hibát töltjük be
+if (!file_exists($target)) {
+    $controllerfile = "error404";
+    $target = SERVER_ROOT . 'controllers/error404.php';
 }
 
+// A vezérlõ fájl betöltése
 include_once($target);
-$class = ucfirst($controllerfile).'_Controller';
-if(class_exists($class))
-	{ $controller = new $class; }
-else
-	{ die('class does not exists!'); }
 
-// spl_autoload_register(...) függvény, amely ismeretlen osztály hívásakor, megpróbálja automatikusan betölteni a megfelelõ fájlt. 
-// A modellekhez használjuk, egységesen nevezzük el fájljainkat (osztály nevével megegyezõ, csupa kisbetûs .php)
-spl_autoload_register(function($className) {
-    $file = SERVER_ROOT.'models/'.strtolower($className).'.php';
-    if(file_exists($file))
-    { include_once($file); }
-    else
-    { die("File '$filename' containing class '$className' not found.");    }
+// A vezérlõ osztály nevét generáljuk
+$class = ucfirst($controllerfile) . '_Controller';
+
+// Ha létezik a vezérlõ osztály, akkor példányosítjuk, különben 404-es hibát jelenítünk meg
+if (class_exists($class)) {
+    $controller = new $class;
+} else {
+    include_once(SERVER_ROOT . 'controllers/error404.php');
+    die('Class does not exist. Redirecting to error page.');
+}
+
+// Az autoload funkció regisztrálása, amely automatikusan betölti a modelleket
+spl_autoload_register(function ($className) {
+    $file = SERVER_ROOT . 'models/' . strtolower($className) . '.php';
+    if (file_exists($file)) {
+        include_once($file);
+    } else {
+        die("File '$file' containing class '$className' not found.");
+    }
 });
 
+// A vezérlõ fõ metódusának meghívása a változókkal
 $controller->main($vars);
-
 ?>

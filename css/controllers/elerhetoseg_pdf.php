@@ -1,9 +1,8 @@
 <?php
 
-
-class Elerhetoseg_SOAPMNB_Controller
+class Elerhetoseg_pdf_Controller
 {
-	public $baseName = 'elerhetoseg_soapmnb';  //meghat�rozni, hogy melyik oldalon vagyunk
+	public $baseName = 'elerhetoseg_pdf';  //meghat�rozni, hogy melyik oldalon vagyunk
 	public function main(array $vars) // a router �ltal tov�bb�tott param�tereket kapja
 	{
 		//bet�ltj�k a n�zetet

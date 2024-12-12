@@ -1,47 +1,88 @@
-
-<h1 id="mnb">MNB ADATOK</h1>
 <?php
-// Az MNB SOAP WSDL URL-je
-$wsdlUrl = "https://www.mnb.hu/arfolyamok.asmx?WSDL";
+// KarakterkÛdol·s be·llÌt·sa
+header('Content-Type: text/html; charset=utf-8');
 
-try {
-    // SOAP kliens l√©trehoz√°sa
-    $client = new SoapClient($wsdlUrl);
+// MNB SOAP API elÈrhetısÈge
+define('MNB_SOAP_URL', 'https://www.mnb.hu/arfolyamok.asmx?wsdl');
 
-    // A megfelel≈ë met√≥dus megh√≠v√°sa a jelenlegi √°rfolyamok lek√©r√©s√©re
-    $response = $client->GetCurrentExchangeRates();
+/**
+ * MNB SOAP kliens inicializ·l·sa
+ */
+function getSoapClient() {
+    return new SoapClient(MNB_SOAP_URL);
+}
 
-    // Az eredm√©ny XML form√°tumban √©rkezik, ez√©rt dolgozzuk fel
-    $xml = simplexml_load_string($response->GetCurrentExchangeRatesResult);
-
-    if ($xml === FALSE) {
-        throw new Exception("Hiba az XML feldolgoz√°sa sor√°n!");
+/**
+ * Valuta ·rfolyam·nak lekÈrdezÈse adott idıszakra
+ * @param string $currency A keresett valuta (pl. "EUR")
+ * @param string $startDate Az idıszak kezdete (pl. "YYYY-MM-DD")
+ * @param string $endDate Az idıszak vÈge (pl. "YYYY-MM-DD")
+ * @return array Az ·rfolyamadatok napi bont·sban
+ */
+function getExchangeRates($currency, $startDate, $endDate) {
+    try {
+        $client = getSoapClient();
+        $response = $client->GetExchangeRates([
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'currencyNames' => $currency,
+        ]);
+        $ratesXml = simplexml_load_string($response->GetExchangeRatesResult);
+        $rates = [];
+        foreach ($ratesXml->Day as $day) {
+            $date = (string)$day['date'];
+            $rate = (string)$day->Rate;
+            $rates[$date] = $rate;
+        }
+        return $rates;
+    } catch (Exception $e) {
+        return ["error" => $e->getMessage()];
     }
+}
 
-    // HTML t√°bl√°zat gener√°l√°sa
-    echo "<table border='1' cellspacing='0' cellpadding='5'>";
-    echo "<tr><th>D√°tum</th><th>Deviza</th><th>Egys√©g</th><th>HUF √Årfolyam</th></tr>";
-
-    foreach ($xml->Day->Rate as $rate) {
-        $currency = (string)$rate['curr'];
-        $unit = (string)$rate['unit'];
-        $value = (string)$rate;
-        $date = (string)$xml->Day['date'];
-
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($date) . "</td>";
-        echo "<td>" . htmlspecialchars($currency) . "</td>";
-        echo "<td>" . htmlspecialchars($unit) . "</td>";
-        echo "<td>" . htmlspecialchars($value) . "</td>";
-        echo "</tr>";
+// A keresı ˚rlap feldolgoz·sa
+$exchangeRates = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $currency = strtoupper(trim($_POST['currency'] ?? ''));
+    if ($currency) {
+        $startDate = date("Y-m-01", strtotime("-1 month")); // Az elm˙lt hÛnap elsı napja
+        $endDate = date("Y-m-t", strtotime("-1 month"));   // Az elm˙lt hÛnap utolsÛ napja
+        $exchangeRates = getExchangeRates($currency, $startDate, $endDate);
     }
-
-    echo "</table>";
-} catch (SoapFault $fault) {
-    // SOAP hiba eset√©n hibajelz√©s
-    echo "SOAP Hiba: " . htmlspecialchars($fault->getMessage());
-} catch (Exception $e) {
-    // Egy√©b hiba eset√©n hibajelz√©s
-    echo "Hiba: " . htmlspecialchars($e->getMessage());
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valuta·rfolyam keresı</title>
+</head>
+<body>
+    <h1>Valuta</h1>
+    <form method="post" action="">
+        <label for="currency">Keresett valuta (pl. EUR):</label>
+        <input type="text" id="currency" name="currency" required>
+        <button type="submit">Keres</button>
+    </form>
+
+    <?php if (!empty($exchangeRates) && !isset($exchangeRates['error'])): ?>
+        
+        <table border="1">
+            <tr>
+                <th>Datum</th>
+                <th>HUF / <?php echo htmlspecialchars($currency); ?></th>
+            </tr>
+            <?php foreach ($exchangeRates as $date => $rate): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($date); ?></td>
+                    <td><?php echo htmlspecialchars($rate); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php elseif (isset($exchangeRates['error'])): ?>
+        <p>Hiba tˆrtÈnt: <?php echo htmlspecialchars($exchangeRates['error']); ?></p>
+    <?php endif; ?>
+</body>
+</html>

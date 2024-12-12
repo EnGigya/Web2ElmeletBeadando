@@ -2,12 +2,16 @@
 
 class Restfulszerver_Controller
 {
-	public $baseName = 'restfulszerver';  //meghatï¿½rozni, hogy melyik oldalon vagyunk
-	public function main(array $vars) // a router ï¿½ltal tovï¿½bbï¿½tott paramï¿½tereket kapja
-	{
-		//betï¿½ltjï¿½k a nï¿½zetet
-		$view = new View_Loader($this->baseName."_main");
-	}
+    // A baseName változó tartalmazza a vezérlõhöz tartozó alapértelmezett nézet nevét
+    public $baseName = 'restfulszerver';  
+
+    // A main metódus fogadja a router által továbbított paramétereket
+    public function main(array $vars)
+    {
+        // A nézet betöltése a View_Loader osztály segítségével
+        // A nézet neve a baseName alapján lesz meghatározva, és a "_main" szuffixummal kiegészítve
+        $view = new View_Loader($this->baseName . "_main");
+    }
 }
 
 ?>

@@ -13,7 +13,7 @@
     //'connection_timeout' => 5000,
     //'cache_wsdl' => WSDL_CACHE_NONE,
    );
-  $client = new SoapClient('http://127.0.0.1/web2/feladat/szerver/nb1.wsdl',$options);
+  $client = new SoapClient('http://localhost/feladat/szerver/nb1.wsdl',$options);
   
   $klubok = $client->getklub();
   echo "<pre>";

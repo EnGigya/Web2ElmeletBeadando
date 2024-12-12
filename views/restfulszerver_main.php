@@ -1,1 +1,1 @@
-<?php require_once 'restful/kliens.php'?>
+<?php require_once 'kliens.php'?>

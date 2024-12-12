@@ -1,12 +1,16 @@
 <?php
 
-//alkalmaz�s gy�k�r k�nyvt�ra a szerveren
-define('SERVER_ROOT', $_SERVER['DOCUMENT_ROOT'].'/web2/');
+// A dokumentum gyökere
+define('SERVER_ROOT', $_SERVER['DOCUMENT_ROOT']);
 
-//URL c�m az alkalmaz�s gy�ker�hez
-define('SITE_ROOT', 'http://127.0.0.1/web2/');
+// A weboldal gyökér URL-je, dinamikusan beállítva
+define('SITE_ROOT', 'http://' . $_SERVER['HTTP_HOST'] . '/');
 
-// a router.php vez�rl� bet�lt�se
-require_once(SERVER_ROOT . 'controllers/' . 'router.php');
-
+// Ellenőrizzük, hogy a fájl elérhető, és betöltjük
+$filePath = SERVER_ROOT . 'controllers/router.php';
+if (file_exists($filePath)) {
+    require_once($filePath);
+} else {
+    echo "A szükséges fájl nem található: " . $filePath;
+}
 ?>

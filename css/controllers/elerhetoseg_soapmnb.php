@@ -1,6 +1,5 @@
 <?php
 
-
 class Elerhetoseg_SOAPMNB_Controller
 {
 	public $baseName = 'elerhetoseg_soapmnb';  //meghat�rozni, hogy melyik oldalon vagyunk

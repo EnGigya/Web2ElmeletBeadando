@@ -9,7 +9,7 @@ class Nb1 {
                               "klub" => Array());
 
          try { 
-             $dbh = new PDO('mysql:host=127.0.0.1;dbname=nb1','root', '',
+             $dbh = new PDO('mysql:host=localhost;dbname=nb1','nb1', '1Defektt.',
              array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION)); 
              $dbh->query('SET NAMES utf8 COLLATE utf8_hungarian_ci'); 
 
@@ -34,7 +34,7 @@ class Nb1 {
                             "csapatnev" => "", 
                             "labdarugo" => Array());
         try {
-            $dbh = new PDO('mysql:host=127.0.0.1;dbname=nb1','root', '',
+            $dbh = new PDO('mysql:host=localhost;dbname=nb1','nb1', '1Defektt.',
 
             array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION));
             $dbh->query('SET NAMES utf8 COLLATE utf8_hungarian_ci');

@@ -1,8 +1,8 @@
 <?php
-    define('HOST', '127.0.0.1');
-    define('DATABASE', 'web2');
-    define('USER', 'root');
-    define('PASSWORD', '');
+    define('HOST', 'localhost');
+    define('DATABASE', 'web222');
+    define('USER', 'web222');
+    define('PASSWORD', '1Defektt.');
     
     class Database {
         private static $connection = FALSE;
