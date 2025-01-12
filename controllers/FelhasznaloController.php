@@ -10,16 +10,18 @@ class FelhasznaloController {
             $utonev = $_POST['utonev'];
             $bejelentkezes = $_POST['bejelentkezes'];
             $jelszo = sha1($_POST['jelszo']);
+            $jogosultsag = $_POST['jogosultsag'];
+              
 
-            // Kapcsolódás az adatbázishoz
+            // Kapcsolï¿½dï¿½s az adatbï¿½zishoz
             $conn = new mysqli('localhost', 'web222', '1Defektt.', 'web222');
             if ($conn->connect_error) {
-                die("Kapcsolódási hiba: " . $conn->connect_error);
+                die("Kapcsolï¿½dï¿½si hiba: " . $conn->connect_error);
             }
 
-            // Beszúrás
+            // Beszï¿½rï¿½s
             $sql = "INSERT INTO felhasznalok (csaladi_nev, utonev, bejelentkezes, jelszo, jogosultsag)
-                    VALUES ('$csaladi_nev', '$utonev', '$bejelentkezes', '$jelszo', '_1_')";
+                    VALUES ('$csaladi_nev', '$utonev', '$bejelentkezes', '$jelszo', '$jogosultsag')";
 
             if ($conn->query($sql) === TRUE) {
                 

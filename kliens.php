@@ -1,96 +1,109 @@
 <?php
-require_once "szerver.php";
-$result = "";
+// Adatbázis kapcsolat beállítása
+$servername = "localhost";
+$username = "web222";
+$password = "1Defektt.";
+$dbname = "web222";
 
-// Ellenőrizzük, hogy van-e POST adat
-if (isset($_POST['id'])) {
-    // Felesleges szóközök eltávolítása
-    $_POST['id'] = trim($_POST['id']);
-    $_POST['csn'] = trim($_POST['csn']);
-    $_POST['un'] = trim($_POST['un']);
-    $_POST['bn'] = trim($_POST['bn']);
-    $_POST['jel'] = trim($_POST['jel']);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Ha nincs id, de minden más adatot megadtak, beszúrás
-    if ($_POST['id'] == "" && $_POST['csn'] != "" && $_POST['un'] != "" && $_POST['bn'] != "" && $_POST['jel'] != "") {
-        $data = [
-            "csn" => $_POST["csn"],
-            "un" => $_POST["un"],
-            "bn" => $_POST["bn"],
-            "jel" => sha1($_POST["jel"])
-        ];
-        $result = sendRequest($url, "POST", $data);
-    }
-    // Ha nincs id, de nem adtak meg minden adatot, hibaüzenet
-    elseif ($_POST['id'] == "") {
-        $result = "Hiba: Hiányos adatok!";
-    }
-    // Ha van id, és legalább egy adatot megadtak, módosítás
-    elseif ($_POST['id'] >= 1 && ($_POST['csn'] != "" || $_POST['un'] != "" || $_POST['bn'] != "" || $_POST['jel'] != "")) {
-        $data = [
-            "id" => $_POST["id"],
-            "csn" => $_POST["csn"],
-            "un" => $_POST["un"],
-            "bn" => $_POST["bn"],
-            "jel" => $_POST["jel"]
-        ];
-        $result = sendRequest($url, "PUT", $data);
-    }
-    // Ha van id, de nem adtak meg semmilyen adatot, törlés
-    elseif ($_POST['id'] >= 1) {
-        $data = ["id" => $_POST["id"]];
-        $result = sendRequest($url, "DELETE", $data);
-    }
-    // Ha az id érvénytelen, hibaüzenet
-    else {
-        $result = "Hiba: Rossz azonosító (Id): " . $_POST['id'];
-    }
+if ($conn->connect_error) {
+    die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-// A felhasználók lekérdezése
-$tabla = fetchData($url);
+// HTTP metódus kezelése
+$method = $_SERVER['REQUEST_METHOD'];
+$id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-// Funkció a HTTP kérés küldésére
-function sendRequest($url, $method, $data)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    $response = curl_exec($ch);
-    curl_close($ch);
-    return $response;
+switch ($method) {
+    case 'GET':
+        if ($id) {
+            getUser($conn, $id);
+        } else {
+            getAllUsers($conn);
+        }
+        break;
+    case 'POST':
+        createUser($conn);
+        break;
+    case 'PUT':
+        updateUser($conn, $id);
+        break;
+    case 'DELETE':
+        deleteUser($conn, $id);
+        break;
+    default:
+        echo json_encode(["message" => "Nem támogatott HTTP metódus"]);
 }
 
-// Funkció a felhasználók adatainak lekérésére
-function fetchData($url)
-{
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    return $response;
+$conn->close();
+
+// Felhasználók listázása
+function getAllUsers($conn) {
+    $sql = "SELECT id, csaladi_nev, utonev, bejelentkezes, jogosultsag FROM felhasznalok";
+    $result = $conn->query($sql);
+
+    $users = [];
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+    echo json_encode($users);
 }
 
+// Egyetlen felhasználó lekérdezése
+function getUser($conn, $id) {
+    $stmt = $conn->prepare("SELECT id, csaladi_nev, utonev, bejelentkezes, jogosultsag FROM felhasznalok WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    echo json_encode($result->fetch_assoc());
+    $stmt->close();
+}
+
+// Új felhasználó létrehozása
+function createUser($conn) {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    $stmt = $conn->prepare("INSERT INTO felhasznalok (csaladi_nev, utonev, bejelentkezes, jelszo, jogosultsag) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $data['csaladi_nev'], $data['utonev'], $data['bejelentkezes'], password_hash($data['jelszo'], PASSWORD_DEFAULT), $data['jogosultsag']);
+
+    if ($stmt->execute()) {
+        echo json_encode(["id" => $conn->insert_id, "message" => "Felhasználó létrehozva"]);
+    } else {
+        echo json_encode(["message" => "Hiba történt a felhasználó létrehozása közben"]);
+    }
+
+    $stmt->close();
+}
+
+// Felhasználó frissítése
+function updateUser($conn, $id) {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    $stmt = $conn->prepare("UPDATE felhasznalok SET csaladi_nev = ?, utonev = ?, bejelentkezes = ?, jogosultsag = ? WHERE id = ?");
+    $stmt->bind_param("ssssi", $data['csaladi_nev'], $data['utonev'], $data['bejelentkezes'], $data['jogosultsag'], $id);
+
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "Felhasználó frissítve"]);
+    } else {
+        echo json_encode(["message" => "Hiba történt a frissítés közben"]);
+    }
+
+    $stmt->close();
+}
+
+// Felhasználó törlése
+function deleteUser($conn, $id) {
+    $stmt = $conn->prepare("DELETE FROM felhasznalok WHERE id = ?");
+    $stmt->bind_param("i", $id);
+
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "Felhasználó törölve"]);
+    } else {
+        echo json_encode(["message" => "Hiba történt a törlés közben"]);
+    }
+
+    $stmt->close();
+}
 ?>
-
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="utf-8">
-    <title>REST GYAKORLAT</title>
-</head>
-<body>
-    <p><?= htmlspecialchars($result) ?></p>
-    <h1>Felhasználók:</h1>
-    <pre><?= htmlspecialchars($tabla) ?></pre>
-    <br>
-    <h2>Módosítás / Beszúrás</h2>
-    <form method="post">
-        Id: <input type="text" name="id"><br><br>
-        Családi név: <input type="text" name="csn" maxlength="45"> Utónév: <input type="text" name="un" maxlength="45"><br><br>
-        Bejelentkezési név: <input type="text" name="bn" maxlength="12"> Jelszó: <input type="text" name="jel"><br><br>
-        <input type="submit" value="Küldés">
-    </form>
-</body>
-</html>

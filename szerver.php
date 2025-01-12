@@ -26,10 +26,10 @@ try {
 				print_r($data);
 				print_r($_POST);
 				*/
-				$sql = "insert into felhasznalok values (id, :csn, :un, :bn, :jel, '')";
+				$sql = "insert into felhasznalok values (0, :csn, :un, :bn, :jel)";
 				$sth = $dbh->prepare($sql);
 				$count = $sth->execute(Array(":csn"=>$data["csn"], ":un"=>$data["un"], ":bn"=>$data["bn"], ":jel"=>$data["jel"]));
-				//$count = $sth->execute(Array(":csn"=>$_POST["csn"], ":un"=>$_POST["un"], ":bn"=>$_POST["bn"], ":jel"=>$_POST["jel"]));				
+				$count = $sth->execute(Array(":csn"=>$_POST["csn"], ":un"=>$_POST["un"], ":bn"=>$_POST["bn"], ":jel"=>$_POST["jel"]));				
 				$newid = $dbh->lastInsertId();
 				$eredmeny .= $count." beszúrt sor: ".$newid;
 			break;

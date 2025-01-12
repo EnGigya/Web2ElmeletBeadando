@@ -1,6 +1,15 @@
-<h1 id="nyitólap">Magyar labdarúgó-bajnokság (első osztály)</h1>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<h1 id="nyitólap">Magyar labdarúgó bajnokság</h1>
 <h3>Története</h3>
-<img id="serleg" src="images/serleg.jpg" alt="serleg">
+
 <p>A magyar bajnokság az egyik legrégibb nagy hagyományokkal rendelkező labdarúgó bajnokság Európában.
  Az elsőt 1901-ben szervezte az MLSZ (Magyar Labdarúgók Szövetsége, ma Magyar Labdarúgó-szövetség), mely 1901 januárjában alakult az addig csak esetleges szervezettséggel játszó csapatok összefogására. 
  E csapatok között számos olyan klubot találunk, amelyek mind a mai napig aktív résztvevői a bajnokságnak, és olyanokat is melyek nevei ma már csak a legvérmesebb futballszurkolóknak mondanak valamit.</p>
@@ -15,7 +24,7 @@
  Az első osztály tagjai voltak még a BTC, a MUE, MAFC és a BSC. Az MTK 1902-ben nevezett először a másodosztályba és a második helyen végezve rögtön fel is jutott az élvonalba, ahol 1904-ben már meg is szerezte első bajnoki címét. 
  Ekkor kezdődött az "örökrangadó", ugyanis az FTC és az MTK uralta a bajnokság korai évtizedeit, míg az 1930-as években fel nem nőtt melléjük az UTE, a második világháború után pedig jött a Honvéd és a Vasas is. 
  A másodosztályban indult UTE 1905-ben mutatkozott be a legjobbak között, ahonnan története során mindössze egyszer, az 1910-11-es szezonban, kiesett, de a második vonal küzdelmeit százszázalékosan nyerve vissza is jutott az első osztályba.</p>
- <img id="csapatok" src="images/csapatok.jpg" alt="">
+
  <p>Mire az UTE az 1929-30-as bajnokságban megszerezte első bajnoki aranyérmét, addigra az FTC 11-szeres, az MTK már 13-szoros bajnok volt. 
  E három csapat dominanciájára jellemző, hogy az 1926 és 1940 között megrendezett 14 bajnokságból mindössze egyszer fordult elő, hogy valamelyik klub leszorult a dobogóról. 
  Ez az 1933-34-es évadban történt, amikor a Debreceni Bocskai, első vidéki csapatként, bronzérmes lett.
@@ -23,3 +32,6 @@
  Az egyre szigorodó zsidótörvények miatt az MTK - amelyet anno a magyar arisztokrácia és a zsidó nagypolgárság alapított - meghatározatlan időre feloszlatta önmagát. A két nagy ellenfél, az FTC és az UTE vezetősége tiltakozott e döntés ellen és kérte a határozat megváltoztatását. 
  Az MTK labdarúgócsapata így négy idényben nem szerepelt (1940-44). A világháború tizedelése után azonban a klub azonnal bejelentette újjáalakulását (1945).</p>
 
+
+</body>
+</html>
